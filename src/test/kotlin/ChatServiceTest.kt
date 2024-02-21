@@ -33,11 +33,8 @@ class ChatServiceTest {
 
     @Test
     fun showAllChats() {
-        service.addChatMessage(1, messages1)
-        service.addChatMessage(2, messages2)
         service.addChatMessage(2, messages3)
-
-        assertNotNull(service.getChats())
+        assertNotNull(service.getChats().lastOrNull())
     }
 
     @Test
@@ -57,7 +54,7 @@ class ChatServiceTest {
         service.addChatMessage(2, messages2)
         service.addChatMessage(2, messages3)
 
-        assertEquals(messages2,service.deleteMessage(2,1))
+        assertTrue(service.deleteMessage(4))
 
         assertEquals(3,service.deleteChat(1))
     }

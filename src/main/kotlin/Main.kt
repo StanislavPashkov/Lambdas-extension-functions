@@ -1,13 +1,14 @@
 package org.example
 
-data class Chat(val messages: MutableList<Messages> = mutableListOf())
+data class Chat(var id: Int, val messages: MutableList<Messages> = mutableListOf())
 
-data class Messages(val text: String, var read: Boolean = false)
+data class Messages(val text: String, var read: Boolean = false, var deleted: Boolean = false)
 
 class NoChatException(message: String) : Exception(message)
 
+
 object ChatService {
-    private var chats = mutableMapOf(10 to Chat())
+    private var chats = mutableMapOf<Int, Chat>()
 
     fun clear() {
         chats = mutableMapOf()
@@ -16,7 +17,7 @@ object ChatService {
     fun getUnreadChatsCount() =
         chats.values.count { chat -> chat.messages.any { !it.read } }
 
-    fun getChats() = chats.values.map { chats.values.joinToString("\n***\n") }.lastOrNull()
+    fun getChats(): List<Chat> = chats.map { it.value }
 
     fun getLastMessages() =
         chats.values.map { it.messages.lastOrNull()?.text ?: "No Messages" }
@@ -27,17 +28,20 @@ object ChatService {
     }
 
     fun addChatMessage(userId: Int, message: Messages) =
-        chats.getOrPut(userId) { Chat() }.messages.plusAssign(message.copy())
+        chats.getOrPut(userId) { Chat(userId) }.messages.plusAssign(message.copy())
 
-    fun deleteMessage(userId: Int, message: Int) =
-        chats.getOrPut(userId) { Chat() }.messages.removeAt(message - 1)
+    fun deleteMessage(userId: Int): Boolean {
+        chats[userId]?.messages?.onEach { it.deleted = true }
+            ?: throw NoChatException("There is no chat with this ID")
+        return true
+    }
+
 
     fun deleteChat(userId: Int): Int {
         chats.remove(userId)
         return chats.values.size
     }
 
-    //chats.remove(userId)?:throw NoChatException("No Chat")
     fun print() =
         println("$chats\n******************************************************")
 
@@ -57,8 +61,8 @@ fun main() {
     println("Получить список чатов")
     println(ChatService.getChats())
     println("Удалить сообщение")
-    println(ChatService.deleteMessage(1, 1))
-    ChatService.print()
+    println(ChatService.deleteMessage(2))
+
     println("Удалить чат")
     println(ChatService.deleteChat(1))
     ChatService.print()
