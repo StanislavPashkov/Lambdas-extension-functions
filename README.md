@@ -1,0 +1,1 @@
+[![Kotlin CI with Gradle](https://github.com/StanislavPashkov/Lambdas-extension-functions/actions/workflows/gradle.yml/badge.svg)](https://github.com/StanislavPashkov/Lambdas-extension-functions/actions/workflows/gradle.yml)
